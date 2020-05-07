@@ -36,17 +36,21 @@
 - (void)viewDidLoad
 {
     [super viewDidLoad];
-    self.title=@"淘你喜欢";
+    self.title = @"淘你喜欢";
     
-
-    [[UIBarButtonItem appearance] setBackButtonTitlePositionAdjustment:UIOffsetMake(0, -60)
-                                                         forBarMetrics:UIBarMetricsDefault];
+    self.navigationItem.leftBarButtonItem = [[UIBarButtonItem alloc]initWithTitle:@"取消" style:UIBarButtonItemStylePlain target:self action:@selector(dismissVC)];
 }
+
+- (void)dismissVC {
+    [self.navigationController dismissViewControllerAnimated:true completion:nil];
+}
+
 -(void)observeValueForKeyPath:(NSString*)keyPath ofObject:(id)object change:(NSDictionary *)change context:(void*)context{
     
     NSLog(@"url == %@",_webView.URL.absoluteString);
     NSString *urlStr = _webView.URL.absoluteString;
     NSRange range;
+#if false
     range = [urlStr rangeOfString:@"access_token"];
     if (range.location != NSNotFound) {
         NSString *accessString = [urlStr substringFromIndex:range.location];
@@ -63,6 +67,24 @@
     }else{
         NSLog(@"Not Found");
     }
+#else
+    range = [urlStr rangeOfString:@"http://localhost:22563/?code"];
+    if (range.location != NSNotFound) {
+        NSString *accessString = [urlStr substringFromIndex:range.location];
+        //        截止到&
+        NSRange range2 = [accessString rangeOfString: @"&"];
+        
+        NSString *access_token_string = [accessString substringWithRange:NSMakeRange(0,range2.location)];
+        NSArray *array = [access_token_string componentsSeparatedByString:@"="];
+        NSString *access_token = array[1];
+        NSLog(@"%@",access_token);
+        //        跳转回去
+        [[NSNotificationCenter defaultCenter] postNotificationName:@"getAccessToken" object:access_token];
+        [self.navigationController popViewControllerAnimated:YES];
+    }else{
+        NSLog(@"Not Found");
+    }
+#endif
 }
 
 -(void)dealloc

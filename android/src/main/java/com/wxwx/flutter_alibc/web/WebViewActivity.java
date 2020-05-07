@@ -70,6 +70,22 @@ public class WebViewActivity extends Activity {
         return "";
     }
 
+    private String getCode(String url) {
+        try {
+            int startIndex = url.indexOf("http://localhost:22563/?code");
+            String subStr = url.substring(startIndex);
+            String tempUrl = URLDecoder.decode(subStr, "UTF-8");
+            int endIndex = tempUrl.indexOf("&");
+            subStr = tempUrl.substring(0, endIndex);
+            startIndex = subStr.indexOf("=");
+            subStr = subStr.substring(startIndex+1);
+            return subStr;
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return "";
+    }
+
     private void openByUrl(String url, WebView webView, HashMap argument) {
         AlibcShowParams showParams = new AlibcShowParams();
         AlibcTaokeParams taokeParams = new AlibcTaokeParams("", "", "");
@@ -101,8 +117,16 @@ public class WebViewActivity extends Activity {
             @Override
             public void onLoadResource(WebView view, String url) {
                 super.onLoadResource(view, url);
-                //如果包含
-                if (url.contains("access_token")){
+//                //如果包含
+//                if (url.contains("access_token")){
+//                    String accessToken = getAccessToken(url);
+//                    if (callBack != null){
+//                        callBack.success(accessToken);
+//                        callBack = null;
+//                    }
+//                    finish();
+//                }
+                if (url.contains("http://localhost:22563/?code")){
                     String accessToken = getAccessToken(url);
                     if (callBack != null){
                         callBack.success(accessToken);
